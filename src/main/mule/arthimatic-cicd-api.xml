@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1827e5ff-8e3d-4f73-986c-417d1841c8fa" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="bf8d73b9-1991-4c86-bcc7-5b17d6e16b67" file="myconfig-dev.yaml" />
+	<flow name="arthimatic-cicd-apiFlow" doc:id="7e232cc3-1b47-4e76-a377-3f371a5addbf" >
+		<http:listener doc:name="Listener" doc:id="5fc80407-20bb-4561-904c-38712da99d2e" config-ref="HTTP_Listener_config" path="/arthmatic"/>
+		<logger level="INFO" doc:name="Logger" doc:id="027580b2-9eee-4d55-b1e1-f0472b116c54" message='-------------before excuted the logger--------------'/>
+		<set-variable value="#[attributes.queryParams.num1]" doc:name="num1" doc:id="a4687d08-e9a8-48ab-a795-0f26c790ef52" variableName="num1"/>
+		<set-variable value="#[attributes.queryParams.num2]" doc:name="num2" doc:id="05fbd356-d10f-4975-b168-398f4df3834b" variableName="num2"/>
+		<ee:transform doc:name="Transform Message" doc:id="3a8278ea-8e7e-4f78-91a4-55337fce1aae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": p('log.message'),
+	"Addition": (vars.num1 + vars.num2),
+	"Subtraction": (vars.num1 - vars.num2),
+	"multiplication": (vars.num1 * vars.num2),
+	"Division": (vars.num1 / vars.num2)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="78d331a3-e207-43a4-8737-5b4a5b970d2d" message='--------------------sucessfully excuted the arthmatic api-----------------'/>
+	</flow>
+</mule>
